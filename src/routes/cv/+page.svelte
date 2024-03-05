@@ -4,7 +4,7 @@
 
 <section class="resume">
 <h3><a href="https://www.linkedin.com/in/abigail-klein-548b69203/" target="_blank">LinkedIn</a></h3>
-<h3></h3><a href="https://github.com/aklein11/" target="_blank">GitHub Profile</a></h3>
+<h3><a href="https://github.com/aklein11/" target="_blank">GitHub Profile</a></h3>
 <h1>School</h1>
 <p>MIT, 2020-2024</p>
 <h1>Current Classes</h1>
