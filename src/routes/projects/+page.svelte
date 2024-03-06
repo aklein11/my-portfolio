@@ -1,20 +1,51 @@
+<script>
+    import projects from '$lib/projects.json';
+    import Project from "$lib/Project.svelte";
+    export let hLevel = 2;
+</script>
+
 <svelte:head>
 	<title>Projects</title>
 </svelte:head>
+
+
+<style>
+    article {
+        display: grid;
+        grid-template-rows: subgrid;
+        grid-row: span 3;
+    }
+
+    h1, h2, h3, h4, h5 h6{
+        line-height: 1.1;
+        text-wrap: balance;
+    }
+
+    h2 {
+        margin: 0;
+        font-size: 120%;
+    }   
+</style>
+
 
 <h1>MIT</h1>
 <p>Robot in 2.S007, Labs in 6.009, Paper in 9.66</p>
 <h1>Internships</h1>
 <p>Google in Cambridge, Google in NY, Amazon in Seattle</p>
 
-<h1>Other</h1>
+<h1>Other { projects.length }</h1>
 <div class="projects">
-    <article>
-        <h2>Lorem ipsum dolor sit.</h2>
-        <img src="https://vis-society.github.io/labs/2/images/empty.svg" alt="">
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Neque temporibus itaque, praesentium eligendi totam adipisci sapiente harum a unde nostrum at illum illo odio. Reprehenderit iure veniam cumque ex eius.</p>
-    </article>
-    <article>
+    {#each projects as p}
+        <article>
+            <svelte:element this={"h" + hLevel}>{ p.title }</svelte:element>
+            <img src={p.image} alt="">
+            <p>{p.description}</p>
+        </article>
+    {/each}
+
+    <Project info={p} />
+
+    <!-- <article>
         <h2>Vero debitis sapiente voluptate!</h2>
         <img src="https://vis-society.github.io/labs/2/images/empty.svg" alt="">
         <p>Quis non, modi recusandae optio nesciunt ipsa qui eaque adipisci cumque fugiat veritatis! Sint vitae quisquam eos tempore placeat, officia eveniet, repudiandae corporis reiciendis iste laudantium distinctio quo. Dolorum, voluptate.</p>
@@ -68,5 +99,5 @@
         <h2>Numquam, consectetur tenetur. Commodi.</h2>
         <img src="https://vis-society.github.io/labs/2/images/empty.svg" alt="">
         <p>Iste impedit excepturi magnam adipisci maiores blanditiis minus, autem accusamus sequi asperiores alias, ipsa tenetur animi voluptates perferendis temporibus recusandae pariatur nobis! Deserunt saepe tempora facere vero qui eligendi asperiores.</p>
-    </article>
+    </article> -->
 </div>
