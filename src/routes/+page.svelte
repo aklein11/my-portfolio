@@ -21,16 +21,11 @@
 
 <img src="images/googleBlurbPicture.jpg" alt="portrait of Abigail" width="450"/>
 
-<div class="projects">
-    <h2>Latest projects</h2>
-    <div class="projects highlights">
-        {#each projects.slice(0, 3) as p}
-            <Project info={p} hLevel=3 />
-            <article>
-                <h2>{p.title}</h2>
-                <img src={p.image} alt="">
-                <p>{p.description}</p>
-            </article>
-        {/each}
-    </div>
+
+<h2>Latest projects</h2>
+<div class="projects highlights">
+    {#each projects.slice(0, 3) as p}
+        <Project info={p} hLevel=3 />
+        
+    {/each}
 </div>

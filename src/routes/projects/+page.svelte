@@ -36,14 +36,15 @@
 <h1>Other { projects.length }</h1>
 <div class="projects">
     {#each projects as p}
-        <article>
+
+    <Project info={p} />
+        <!-- <article>
             <svelte:element this={"h" + hLevel}>{ p.title }</svelte:element>
             <img src={p.image} alt="">
             <p>{p.description}</p>
-        </article>
+        </article> -->
     {/each}
 
-    <Project info={p} />
 
     <!-- <article>
         <h2>Vero debitis sapiente voluptate!</h2>

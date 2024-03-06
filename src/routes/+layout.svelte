@@ -1,4 +1,4 @@
-YOLO <slot />
+<slot />
 
 <script>
     let pages = [
