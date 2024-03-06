@@ -58,31 +58,6 @@ p {
 	font-size: 100%;
 }
 
-nav {
-	--border-color: oklch(50% 10% 200 / 40%);
-	
-	display: flex;
-	margin-bottom: 20px;
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-	border-bottom-color: oklch(80% 3% 200 / 40%);
-}
-
-nav a {
-	text-decoration: none;
-	color: inherit;
-	text-align: center;
-	padding: .5em;
-}
-
-nav a:hover {
-    border-bottom-width: 1px;
-	border-bottom-style: solid;
-	border-bottom-color: var(--color-accent);
-	/* background-color: oklch(from var(--color-accent) 95% 5% h) */
-	background-color: color-mix(in oklch, var(--color-accent), canvas 85%);
-}
-
 label, input, textarea, button {
 	/* Make these elements behave like block elements,
 	   i.e. create line breaks before and after
