@@ -10,28 +10,28 @@ let currentLink = navLinks.find(a => a.host === location.host && a.pathname === 
 currentLink?.classList.add("current");
 
 // consolidate nav menu code
-let pages = {
-	".": "Home",
-	"projects": "Projects",
-    "contact": "Contact",
-    "resume": "Resume"
-	/* add the rest of your pages here */
-};
-let nav = document.createElement("nav");
-document.body.prepend(nav);
-for (let url in pages) {
-	let title = pages[url];
-	// Create link and add it to nav
-    let a = document.createElement("a");
-    a.href = url;
-    a.textContent = title;
-    if (a.host === location.host && a.pathname === location.pathname) {
-        a.classList.add("current");
-    }
+// let pages = {
+// 	".": "Home",
+// 	"projects": "Projects",
+//     "contact": "Contact",
+//     "resume": "Resume"
+// 	/* add the rest of your pages here */
+// };
+// let nav = document.createElement("nav");
+// document.body.prepend(nav);
+// for (let url in pages) {
+// 	let title = pages[url];
+// 	// Create link and add it to nav
+//     let a = document.createElement("a");
+//     a.href = url;
+//     a.textContent = title;
+//     if (a.host === location.host && a.pathname === location.pathname) {
+//         a.classList.add("current");
+//     }
     
-    // a.target = "_blank"
-    nav.append(a);
-}
+//     // a.target = "_blank"
+//     nav.append(a);
+// }
 
 // nav.insertAdjacentHTML("beforeend", `<a href="${ url }">${ title }</a>` );
 // Create link and add it to nav

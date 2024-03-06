@@ -1,18 +1,19 @@
-<slot />
-
 <script>
+    import { page } from '$app/stores';
+    
     let pages = [
-        {url: "./", title: "Home"},
-        {url: "./projects", title: "Projects"},
+        { url: "./", title: "Home" },
+        { url: "./projects", title: "Projects" },
+        { url: "contact", title: "Contact" },
+        { url: "resume", title: "Resume" },
         // add the rest of your pages here
     ];
 </script>
 
 <nav>
-	{#each pages as p }
-		<!-- Link here, using {p.url} for the URL and {Home.title} -->
-        <!-- Link here, using {p.url} for the URL and {Projects.title} -->
-        <!-- Link here, using {p.url} for the URL and {Contact.title} -->
-        <!-- Link here, using {p.url} for the URL and {Resume.title} -->
-	{/each}
+    {#each pages as p}
+    <a href={ p.url } class:current={ "." + $page.route.id === p.url }>{ p.title }</a>
+    {/each}
 </nav>
+
+<slot />
