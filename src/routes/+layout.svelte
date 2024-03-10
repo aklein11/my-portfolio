@@ -8,6 +8,13 @@
         { url: "resume", title: "Resume" },
         // add the rest of your pages here
     ];
+
+    let colorScheme = "light dark";
+    let root = globalThis?.document?.documentElement;
+    $: root?.style.setProperty("color-scheme", colorScheme);
+
+    let localStorage = globalThis.localStorage ?? {};
+    $: localStorage.colorScheme = colorScheme;
 </script>
 
 <style>
@@ -44,5 +51,14 @@
         </a>
     {/each}
 </nav>
+
+<label class="color-scheme", position: absolute, top=1rem, right=1rem>
+    Theme:
+    <select bind:value={ colorScheme }>
+        <option value="light dark">Automatic</option>
+        <option value="light">Light Mode</option>
+        <option value="dark">Dark Mode</option>
+    </select>
+</label>
 
 <slot />
