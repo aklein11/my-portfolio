@@ -9,12 +9,12 @@
         // add the rest of your pages here
     ];
 
-    let colorScheme = "light dark";
-    let root = globalThis?.document?.documentElement;
-    $: root?.style.setProperty("color-scheme", colorScheme);
-
     let localStorage = globalThis.localStorage ?? {};
-    $: localStorage.colorScheme = colorScheme;
+    let colorScheme = localStorage.colorScheme ?? "light dark";
+	let root = globalThis?.document?.documentElement;
+
+	$: localStorage.colorScheme = colorScheme;
+	$: root?.style.setProperty('color-scheme', colorScheme);
 </script>
 
 <style>

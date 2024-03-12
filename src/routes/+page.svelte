@@ -1,6 +1,8 @@
 <script>
     import projects from '$lib/projects.json';
     import Project from "$lib/Project.svelte";
+    // import {onMount} from 'svelte';
+    // let profileData = { loading: true, error: null, data: null };
 </script>
 
 <svelte:head>
@@ -22,7 +24,12 @@
             {#await response.json()}
                 <p>Decoding...</p>
             {:then data}
-                <p>The data is { JSON.stringify(data) }</p>
+                <!-- <p>The data is { JSON.stringify(data) }</p> -->
+                <dl>
+                    <dt>Followers: </dt><dd>{ JSON.stringify(data.followers) }</dd>
+                    <dt>Following: </dt><dd>{ JSON.stringify(data.following) }</dd>
+                    <dt>Number Public Repos: </dt><dd>{ JSON.stringify(data.public_repos) }</dd>
+                </dl>
             {:catch error}
                 <p class="error">
                     Something went wrong: {error.message}
@@ -34,10 +41,7 @@
             </p>
         {/await}
     </main>
-    <dl>
-        <dt>Followers: </dt><dd>followers</dd>
-        <dt>Number Public Repos: </dt><dd>public_repos</dd>
-    </dl>
+    
 </section>
 
 <h2>Latest projects</h2>
