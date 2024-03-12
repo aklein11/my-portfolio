@@ -26,9 +26,9 @@
             {:then data}
                 <!-- <p>The data is { JSON.stringify(data) }</p> -->
                 <dl>
-                    <dt>Followers: </dt><dd>{ JSON.stringify(data.followers) }</dd>
-                    <dt>Following: </dt><dd>{ JSON.stringify(data.following) }</dd>
-                    <dt>Number Public Repos: </dt><dd>{ JSON.stringify(data.public_repos) }</dd>
+                    <dt>Followers: </dt><dd>{ data.followers }</dd>
+                    <dt>Following: </dt><dd>{ data.following }</dd>
+                    <dt>Number Public Repos: </dt><dd>{ data.public_repos }</dd>
                 </dl>
             {:catch error}
                 <p class="error">
