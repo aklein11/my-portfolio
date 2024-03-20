@@ -1,10 +1,11 @@
-<script>export let info={}; let p = info;</script>
+<script>export let info={};</script>
+
 <article>
-    <h2>{p.title}</h2>
-    <img src={p.image} alt="">
+    <h2>{info.title}</h2>
+    <img src={info.image} alt="">
     <div>
-        <p>{p.description}</p>
-        <p>{p.year}</p>
+        <p>{info.description}</p>
+        <p>{info.year}</p>
     </div>
 </article>
 
