@@ -6,6 +6,7 @@
         { url: "./projects", title: "Projects" },
         { url: "contact", title: "Contact" },
         { url: "resume", title: "Resume" },
+        { url: "meta", title: "Meta" },
         // add the rest of your pages here
     ];
 
@@ -41,6 +42,12 @@
         border-bottom-color: var(--color-accent);
         /* background-color: oklch(from var(--color-accent) 95% 5% h) */
         background-color: color-mix(in oklch, var(--color-accent), canvas 85%);
+    }
+
+    .color-scheme {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
     }
 </style>
 
