@@ -7,6 +7,7 @@
         autoPlacement,
         offset,
     } from '@floating-ui/dom';
+    import Pie from "$lib/Pie.svelte";
 
 
     let data = [];
@@ -50,7 +51,7 @@
             .tickSize(-usableArea.width)
         );
     }
-    let brushBox;
+    
     
     onMount(async () => {
         data = await d3.csv("loc.csv", row => ({
@@ -83,11 +84,6 @@
 	        return ret;
         });
 
-        $: {
-            d3.select(svg).call(d3.brush());
-            d3.select(svg).selectAll(".dots, .overlay ~ *").raise();
-        }
-
         console.log(commits)
     });
 
@@ -110,7 +106,38 @@
         }
     }
 
-    
+    function brushed (evt) {
+        console.log(evt);
+        if (evt.selection) {
+            brushSelection = evt.selection;
+        } else {
+            brushSelection = null;
+        }
+    }
+
+    let svg;
+    $: {
+        d3.select(svg).call(d3.brush().on("start brush end", brushed));
+        d3.select(svg).selectAll(".dots, .overlay ~ *").raise();
+    }
+
+    let brushSelection; 
+    function isCommitSelected (commit) {
+        if (!brushSelection) {
+            return false;
+        }
+        let min = {x: brushSelection[0][0], y: brushSelection[0][1]};
+        let max = {x: brushSelection[1][0], y: brushSelection[1][1]};
+        let x = xScale(commit.date);
+        let y = yScale(commit.hourFrac);
+        return x >= min.x && x <= max.x && y >= min.y && y <= max.y;
+    }
+
+    let selectedCommits, hasSelection, selectedLines, languageBreakdown;
+    $: selectedCommits = brushSelection ? commits.filter(isCommitSelected) : [];
+    $: hasSelection = brushSelection && selectedCommits.length > 0;
+    $: selectedLines = (hasSelection ? selectedCommits : commits).flatMap(d => d.lines);
+    $: languageBreakdown = d3.rollups(selectedLines, v => d3.max(v, v => v.line), d => d.type);
 
 </script>
 
@@ -152,7 +179,7 @@
 
 <h3>Commits by time of day</h3>
 
-<svg viewBox="0 0 {width} {height}" bind:this={brushBox}>
+<svg viewBox="0 0 {width} {height}" bind:this={svg}>
 	<!-- scatterplot will go here -->
     <g class="dots">
         {#each commits as commit, index }
@@ -168,6 +195,8 @@
                     }
                 }
                 on:mouseleave={evt => hoveredIndex = -1}
+
+                class:selected={isCommitSelected(commit)}
             />
         {/each}
     </g>
@@ -196,6 +225,24 @@
     <dd>{ hoveredCommit.totalLines }</dd>
 </dl>
 
+<p>{hasSelection ? selectedCommits.length : "No"} commits selected</p>
+
+
+    {#each languageBreakdown as [language, lines] }
+        <div>
+            <dt>
+                {language}
+                {lines} lines {selectedLines.length}
+                
+            </dt>
+        </div>
+    {/each}
+{hasSelection}
+
+
+<Pie data={Array.from(languageBreakdown).map(([language, lines]) => ({label: language, value: lines}))} />
+
+
 
 <style>
 	svg {
@@ -208,7 +255,7 @@
 
     dl.info {
         display: grid;
-        grid-template-columns: auto auto; /* make 2 columns */
+        grid-template-columns: repeat(auto-fill);
         gap: 0; /* Remove default gap */
         
         transition-duration: 500ms;
@@ -252,5 +299,8 @@
         }
     }
 
+    .selected {
+        fill: orange; 
+    }
 
 </style>
