@@ -106,6 +106,7 @@
         }
     }
 
+    let brushSelection; 
     function brushed (evt) {
         console.log(evt);
         if (evt.selection) {
@@ -121,7 +122,7 @@
         d3.select(svg).selectAll(".dots, .overlay ~ *").raise();
     }
 
-    let brushSelection; 
+    
     function isCommitSelected (commit) {
         if (!brushSelection) {
             return false;
@@ -230,11 +231,14 @@
 
     {#each languageBreakdown as [language, lines] }
         <div>
-            <dt>
-                {language}
-                {lines} lines {selectedLines.length}
-                
-            </dt>
+            <dl class="">
+                <dt>
+                    {language}
+                </dt>
+                <dd>
+                    {lines} lines
+                </dd>
+            </dl>
         </div>
     {/each}
 {hasSelection}
@@ -269,23 +273,28 @@
 
     dl.info dt {
         font-weight: bold; /* Make labels bold */
-        color: #ff7676; /* Make labels less prominent */
+        color: #4a0000; /* Make labels less prominent */
+    }
+
+    dl.info dd {
+        font-weight: bold; /* Make labels bold */
+        color: #001a4a; /* Make labels less prominent */
     }
 
     .tooltip {
         position: fixed;
-        bottom: 1em; 
         right: 1em; /* Adjust as needed */
         z-index: 1000; /* Ensure tooltip appears above other content */
-        background-color: #ffffff87;
+        background-color: #9d9d9dda;
         border: 1px solid #ccc;
         padding: 0.5em;
         border-radius: 4px;
         box-shadow: 0 2px 4px rgba(213, 213, 213, 0.555);
         backdrop-filter: blur(4px);
-        max-width: 200px; /* Adjust as needed */
-        max-height: 200px;
+        max-width: 220px; /* Adjust as needed */
+        /* max-height: 200px; */
         overflow-wrap: break-word; /* Allow word wrapping */
+        /* color: #001a4a; */
     }
 
     circle {
@@ -295,7 +304,6 @@
 
         &:hover {
             transform: scale(1.5);
-
         }
     }
 
