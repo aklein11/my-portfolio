@@ -91,15 +91,15 @@
     $: averageDepth = data.length > 0  ? d3.mean(data, d => d.depth).toFixed(1) : "no data";
     $: numberFiles = data.length > 0 ? d3.group(data, d => d.file).size : "no data";
 
-    let hoveredIndex = -1;
+    let hoveredIndex;
     $: hoveredCommit = commits[hoveredIndex] ?? {};
     let cursor = {x: 0, y: 0};
     let commitTooltip;
     let tooltipPosition = {x: 0, y: 0};
 
     // Function to compute tooltip position
-    function computeTooltipPosition(hoveredDot) {
-        return computePosition(hoveredDot, commitTooltip, {
+    async function computeTooltipPosition(hoveredDot) {
+        return await computePosition(hoveredDot, commitTooltip, {
             strategy: "fixed", 
             middleware: [
                 offset(5), 
@@ -108,17 +108,19 @@
         });
     }
 
-    function dotInteraction (index, evt) {
+    async function dotInteraction (index, evt) {
         const hoveredDot = evt.target;
         const eventType = evt.type;
 
         if (eventType === "mouseenter" || eventType === "focus") {
             // dot hovered
-            tooltipPosition = computeTooltipPosition(hoveredDot);
+            tooltipPosition = await computeTooltipPosition(hoveredDot);
+            hoveredIndex = index;
         }
         else if (eventType === "mouseleave" || eventType === "blur") {
             // dot unhovered
-            tooltipPosition = { x: 0, y: 0 };
+            // tooltipPosition = { x: 0, y: 0 };
+            hoveredIndex = -1;
         }
     }
 
@@ -220,21 +222,23 @@
 </svg>
 
 
-<dl id="commit-tooltip" class="info tooltip" hidden={hoveredIndex === -1} style="top: {tooltipPosition.y}px; left: {tooltipPosition.x}px"  bind:this={commitTooltip}>
-    <dt>Commit</dt>
-    <dd><a href="{ hoveredCommit.url }" target="_blank">{ hoveredCommit.id } </a></dd>
+<dl id="commit-tooltip" class="info tooltip" hidden={hoveredIndex === -1 || !hoveredCommit} style="top: {tooltipPosition.y}px; left: {tooltipPosition.x}px"  bind:this={commitTooltip}>
+    {#if hoveredCommit}
+        <dt>Commit</dt>
+        <dd><a href="{ hoveredCommit.url }" target="_blank">{ hoveredCommit.id } </a></dd>
 
-    <dt>Date</dt>
-    <dd>{ hoveredCommit.datetime?.toLocaleString("en", {date: "full"}) }</dd>
+        <dt>Date</dt>
+        <dd>{ hoveredCommit.datetime?.toLocaleString("en", {date: "full"}) }</dd>
 
-    <dt>Time</dt>
-    <dd>{ hoveredCommit.datetime?.toLocaleString("en", {time: "short"}) }</dd>
+        <dt>Time</dt>
+        <dd>{ hoveredCommit.datetime?.toLocaleString("en", {time: "short"}) }</dd>
 
-    <dt>Author</dt>
-    <dd>{ hoveredCommit.author }</dd>
+        <dt>Author</dt>
+        <dd>{ hoveredCommit.author }</dd>
 
-    <dt>Lines Edited</dt>
-    <dd>{ hoveredCommit.totalLines }</dd>
+        <dt>Lines Edited</dt>
+        <dd>{ hoveredCommit.totalLines }</dd> 
+    {/if}
 </dl>
 
 <p>{hasSelection ? selectedCommits.length : "No"} commits selected</p>
