@@ -13,7 +13,6 @@
             let values = Object.values(project).join("\n").toLowerCase();
 	        return values.includes(query.toLowerCase());
         }
-        
         return true;
     });
 

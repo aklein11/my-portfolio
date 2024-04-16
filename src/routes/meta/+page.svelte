@@ -97,23 +97,41 @@
     let commitTooltip;
     let tooltipPosition = {x: 0, y: 0};
 
+    // Function to compute tooltip position
+    function computeTooltipPosition(hoveredDot) {
+        return computePosition(hoveredDot, commitTooltip, {
+            strategy: "fixed", 
+            middleware: [
+                offset(5), 
+                autoPlacement()
+            ],
+        });
+    }
+
     function dotInteraction (index, evt) {
-        if (evt.type === "mouseenter" || evt.type === "focus") {
+        const hoveredDot = evt.target;
+        const eventType = evt.type;
+
+        if (eventType === "mouseenter" || eventType === "focus") {
             // dot hovered
+            tooltipPosition = computeTooltipPosition(hoveredDot);
         }
-        else if (evt.type === "mouseleave" || evt.type === "blur") {
+        else if (eventType === "mouseleave" || eventType === "blur") {
             // dot unhovered
+            tooltipPosition = { x: 0, y: 0 };
         }
     }
 
-    let brushSelection; 
+    
     function brushed (evt) {
-        console.log(evt);
-        if (evt.selection) {
-            brushSelection = evt.selection;
-        } else {
-            brushSelection = null;
-        }
+        let brushSelection = evt.selection;
+        selectedCommits = !brushSelection ? [] : commits.filter(commit => {
+            let min = {x: brushSelection[0][0], y: brushSelection[0][1]};
+            let max = {x: brushSelection[1][0], y: brushSelection[1][1]};
+            let x = xScale(commit.date);
+            let y = yScale(commit.hourFrac);
+            return x >= min.x && x <= max.x && y >= min.y && y <= max.y;
+        })
     }
 
     let svg;
@@ -124,19 +142,12 @@
 
     
     function isCommitSelected (commit) {
-        if (!brushSelection) {
-            return false;
-        }
-        let min = {x: brushSelection[0][0], y: brushSelection[0][1]};
-        let max = {x: brushSelection[1][0], y: brushSelection[1][1]};
-        let x = xScale(commit.date);
-        let y = yScale(commit.hourFrac);
-        return x >= min.x && x <= max.x && y >= min.y && y <= max.y;
+        return selectedCommits.includes(commit);
     }
 
-    let selectedCommits, hasSelection, selectedLines, languageBreakdown;
-    $: selectedCommits = brushSelection ? commits.filter(isCommitSelected) : [];
-    $: hasSelection = brushSelection && selectedCommits.length > 0;
+    let hasSelection, selectedLines, languageBreakdown;
+    let selectedCommits = [];
+    $: hasSelection = selectedCommits.length > 0;
     $: selectedLines = (hasSelection ? selectedCommits : commits).flatMap(d => d.lines);
     $: languageBreakdown = d3.rollups(selectedLines, v => d3.max(v, v => v.line), d => d.type);
 
@@ -189,14 +200,14 @@
                 cy={ yScale(commit.hourFrac) }
                 r="5"
                 fill="steelblue"
-
-                on:mouseenter={evt => {
-                    hoveredIndex = index;
-                    cursor = {x: evt.x, y: evt.y};
-                    }
-                }
-                on:mouseleave={evt => hoveredIndex = -1}
-
+                tabindex="0"
+                aria-describedby="commit-tooltip"
+                role="tooltip"
+                aria-haspopup="true"
+                on:mouseenter={evt => dotInteraction(index, evt)}
+                on:mouseleave={evt => dotInteraction(index, evt)}
+                on:focus={evt => dotInteraction(index, evt)} 
+                on:blur={evt => dotInteraction(index, evt)}
                 class:selected={isCommitSelected(commit)}
             />
         {/each}
@@ -209,9 +220,9 @@
 </svg>
 
 
-<dl id="commit-tooltip" class="info tooltip" hidden={hoveredIndex === -1} style="top: {cursor.y}px; left: {cursor.x}px"  bind:this={commitTooltip}>
+<dl id="commit-tooltip" class="info tooltip" hidden={hoveredIndex === -1} style="top: {tooltipPosition.y}px; left: {tooltipPosition.x}px"  bind:this={commitTooltip}>
     <dt>Commit</dt>
-    <dd><a href="{ hoveredCommit.url }" target="_blank">{ hoveredCommit.id }</a></dd>
+    <dd><a href="{ hoveredCommit.url }" target="_blank">{ hoveredCommit.id } </a></dd>
 
     <dt>Date</dt>
     <dd>{ hoveredCommit.datetime?.toLocaleString("en", {date: "full"}) }</dd>
@@ -291,8 +302,9 @@
         border-radius: 4px;
         box-shadow: 0 2px 4px rgba(213, 213, 213, 0.555);
         backdrop-filter: blur(4px);
-        max-width: 220px; /* Adjust as needed */
-        /* max-height: 200px; */
+        max-width: max-content; /* Adjust as needed */
+        top: 0;
+        left: 0;
         overflow-wrap: break-word; /* Allow word wrapping */
         /* color: #001a4a; */
     }
