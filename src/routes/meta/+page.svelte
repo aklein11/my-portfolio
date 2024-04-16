@@ -1,3 +1,9 @@
+<!-- 
+    TODOs
+    - get brush to select dots when they are highlighted (not when a point 20px to their left is highlighted)
+    - reformat stats on the page (abt github and abt dots)
+-->
+
 <script>
 
     import * as d3 from "d3";
@@ -28,8 +34,6 @@
     let dateExtent;
     $: dateExtent = d3.extent(commits, d => d.datetime);
 
-    console.log('unMounted Data', data )
-
     $: xScale = d3.scaleTime()
         .domain(dateExtent)
         .range([usableArea.left, usableArea.right])
@@ -51,7 +55,7 @@
             .tickSize(-usableArea.width)
         );
     }
-    
+
     
     onMount(async () => {
         data = await d3.csv("loc.csv", row => ({
@@ -91,9 +95,8 @@
     $: averageDepth = data.length > 0  ? d3.mean(data, d => d.depth).toFixed(1) : "no data";
     $: numberFiles = data.length > 0 ? d3.group(data, d => d.file).size : "no data";
 
-    let hoveredIndex;
+    let hoveredIndex = -1;
     $: hoveredCommit = commits[hoveredIndex] ?? {};
-    let cursor = {x: 0, y: 0};
     let commitTooltip;
     let tooltipPosition = {x: 0, y: 0};
 
@@ -119,8 +122,10 @@
         }
         else if (eventType === "mouseleave" || eventType === "blur") {
             // dot unhovered
-            // tooltipPosition = { x: 0, y: 0 };
             hoveredIndex = -1;
+        }
+        else if (eventType === "click" || (eventType === "keyup" && evt.key === "Enter")) {
+            selectedCommits = [commits[index]]
         }
     }
 
@@ -132,7 +137,8 @@
             let max = {x: brushSelection[1][0], y: brushSelection[1][1]};
             let x = xScale(commit.date);
             let y = yScale(commit.hourFrac);
-            return x >= min.x && x <= max.x && y >= min.y && y <= max.y;
+            console.log(' max.x',  max.x )
+            return (x >= min.x) && (x <= max.x) && (y >= min.y) && (y <= max.y);
         })
     }
 
@@ -200,7 +206,7 @@
             <circle
                 cx={ xScale(commit.datetime) }
                 cy={ yScale(commit.hourFrac) }
-                r="5"
+                r="15"
                 fill="steelblue"
                 tabindex="0"
                 aria-describedby="commit-tooltip"
@@ -210,6 +216,8 @@
                 on:mouseleave={evt => dotInteraction(index, evt)}
                 on:focus={evt => dotInteraction(index, evt)} 
                 on:blur={evt => dotInteraction(index, evt)}
+                on:click={evt => dotInteraction(index, evt)}
+                on:keyup={evt => dotInteraction(index, evt)}
                 class:selected={isCommitSelected(commit)}
             />
         {/each}
@@ -222,41 +230,38 @@
 </svg>
 
 
-<dl id="commit-tooltip" class="info tooltip" hidden={hoveredIndex === -1 || !hoveredCommit} style="top: {tooltipPosition.y}px; left: {tooltipPosition.x}px"  bind:this={commitTooltip}>
-    {#if hoveredCommit}
-        <dt>Commit</dt>
-        <dd><a href="{ hoveredCommit.url }" target="_blank">{ hoveredCommit.id } </a></dd>
+<dl id="commit-tooltip" class="info tooltip" hidden={hoveredIndex === -1} style="top: {tooltipPosition.y}px; left: {tooltipPosition.x}px"  bind:this={commitTooltip}>
+    <dt>Commit</dt>
+    <dd><a href="{ hoveredCommit.url }" target="_blank">{ hoveredCommit.id } </a></dd>
 
-        <dt>Date</dt>
-        <dd>{ hoveredCommit.datetime?.toLocaleString("en", {date: "full"}) }</dd>
+    <dt>Date</dt>
+    <dd>{ hoveredCommit.datetime?.toLocaleString("en", {date: "full"}) }</dd>
 
-        <dt>Time</dt>
-        <dd>{ hoveredCommit.datetime?.toLocaleString("en", {time: "short"}) }</dd>
+    <dt>Time</dt>
+    <dd>{ hoveredCommit.datetime?.toLocaleString("en", {time: "short"}) }</dd>
 
-        <dt>Author</dt>
-        <dd>{ hoveredCommit.author }</dd>
+    <dt>Author</dt>
+    <dd>{ hoveredCommit.author }</dd>
 
-        <dt>Lines Edited</dt>
-        <dd>{ hoveredCommit.totalLines }</dd> 
-    {/if}
+    <dt>Lines Edited</dt>
+    <dd>{ hoveredCommit.totalLines }</dd> 
 </dl>
 
 <p>{hasSelection ? selectedCommits.length : "No"} commits selected</p>
 
 
-    {#each languageBreakdown as [language, lines] }
-        <div>
-            <dl class="">
-                <dt>
-                    {language}
-                </dt>
-                <dd>
-                    {lines} lines
-                </dd>
-            </dl>
-        </div>
-    {/each}
-{hasSelection}
+{#each languageBreakdown as [language, lines] }
+    <div>
+        <dl class="stats">
+            <dt>
+                {language}
+            </dt>
+            <dd>
+                {lines} lines
+            </dd>
+        </dl>
+    </div>
+{/each}
 
 
 <Pie data={Array.from(languageBreakdown).map(([language, lines]) => ({label: language, value: lines}))} />
@@ -267,6 +272,24 @@
 	svg {
 		overflow: visible;
 	}
+
+   .stats {
+        /* display: grid;   */
+        /* grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); */
+        flex-direction: column;  /* Arrange items horizontally */
+        justify-content: space-between;  /* Distribute items evenly along the main axis */
+        align-items: center;  /* Align items vertically */
+    }
+
+    .stats dt {
+        margin-right: 10px;  /* Add some margin between dt and dd */
+        grid-row: 1;  /* Place dt in the first row */
+        /* display: inline-block; */
+    }
+
+    .stats dd {
+        grid-row: 2;  /* Place dd in the second row */
+    }
 
     .gridlines {
         stroke-opacity: .2;

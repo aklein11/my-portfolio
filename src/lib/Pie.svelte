@@ -15,11 +15,6 @@
     //     { value: 5, label: "cherries" }
     // ];
 
-    let arcData, arcs;
-    let sliceGenerator = d3.pie().value(d => d.value);
-    $: arcData = sliceGenerator(data);
-    $: arcs = arcData.map(d => arcGenerator(d));
-
     let colors = d3.scaleOrdinal(d3.schemeTableau10);
 
     function toggleWedge (index, event) {
@@ -28,25 +23,39 @@
         }
     }
 
+    let pieData, arcData, arcs;
+    let sliceGenerator = d3.pie().value(d => d.value);
+
+    $: {
+        // set up copy of data
+        pieData = data.map(d => ({...d})); 
+    };
+
+    $: {
+        // modify 
+        arcData = sliceGenerator(pieData);
+        arcs = arcData.map(d => arcGenerator(d));
+        pieData = pieData.map((d, i) => ({...d, ...arcData[i], arc: arcs[i]}));
+    }
 </script>
 
 
 <div class="container">
     <svg viewBox="-50 -50 100 100">
-        {#each arcs as arc, i}
-            <path d={arc} fill={colors(i)} 
+        {#each pieData as d, i}
+            <path d={d.arc} fill={colors(d.label)} 
                 class:selected={selectedIndex === i}
                 on:click={e => toggleWedge(i, e)} 
                 on:keyup={e => toggleWedge(i, e)}  
                 tabindex="0" role="button" aria-label="pie wedge"
-                style="--start-angle: { arcData[i]?.startAngle }rad;
-	                    --end-angle: { arcData[i]?.endAngle }rad;"/>
+                style="--start-angle: { d.startAngle }rad;
+	                    --end-angle: { d.endAngle }rad;"/>
         {/each}
     </svg>
 
     <ul class="legend">
-        {#each data as d, index}
-            <li class="legend-item" style="--color: { colors(index) }">
+        {#each pieData as d, i}
+            <li class="legend-item" style="--color: { colors(d.label) }">
                 <span class="swatch"></span>
                 {d.label} <em>({d.value})</em>
                 <!-- class:selected={selectedIndex === index} -->
