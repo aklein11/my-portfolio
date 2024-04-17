@@ -1,6 +1,5 @@
 <!-- 
     TODOs
-    - get brush to select dots when they are highlighted (not when a point 20px to their left is highlighted)
     - reformat stats on the page (abt github and abt dots)
 -->
 
@@ -56,7 +55,13 @@
         );
     }
 
-    
+    let commitProgress = 100;
+    $: timeScale = d3.scaleTime()
+        .range([0, 100]) // what you input into the function
+        .domain(dateExtent); // what you get out of the function
+    $: commitMaxTime = timeScale.invert(commitProgress);
+
+
     onMount(async () => {
         data = await d3.csv("loc.csv", row => ({
             ...row,
@@ -98,6 +103,7 @@
     let hoveredIndex = -1;
     $: hoveredCommit = commits[hoveredIndex] ?? {};
     let commitTooltip;
+    let showTooltip = false;
     let tooltipPosition = {x: 0, y: 0};
 
     // Function to compute tooltip position
@@ -119,10 +125,12 @@
             // dot hovered
             tooltipPosition = await computeTooltipPosition(hoveredDot);
             hoveredIndex = index;
+            showTooltip = true;
         }
         else if (eventType === "mouseleave" || eventType === "blur") {
             // dot unhovered
-            hoveredIndex = -1;
+            // hoveredIndex = -1;
+            showTooltip = false;
         }
         else if (eventType === "click" || (eventType === "keyup" && evt.key === "Enter")) {
             selectedCommits = [commits[index]]
@@ -135,9 +143,8 @@
         selectedCommits = !brushSelection ? [] : commits.filter(commit => {
             let min = {x: brushSelection[0][0], y: brushSelection[0][1]};
             let max = {x: brushSelection[1][0], y: brushSelection[1][1]};
-            let x = xScale(commit.date);
+            let x = xScale(commit.date) + usableArea.left;
             let y = yScale(commit.hourFrac);
-            console.log(' max.x',  max.x )
             return (x >= min.x) && (x <= max.x) && (y >= min.y) && (y <= max.y);
         })
     }
@@ -158,6 +165,7 @@
     $: hasSelection = selectedCommits.length > 0;
     $: selectedLines = (hasSelection ? selectedCommits : commits).flatMap(d => d.lines);
     $: languageBreakdown = d3.rollups(selectedLines, v => d3.max(v, v => v.line), d => d.type);
+
 
 </script>
 
@@ -208,7 +216,7 @@
                 cy={ yScale(commit.hourFrac) }
                 r="15"
                 fill="steelblue"
-                tabindex="0"
+                tabindex={0}
                 aria-describedby="commit-tooltip"
                 role="tooltip"
                 aria-haspopup="true"
@@ -230,7 +238,7 @@
 </svg>
 
 
-<dl id="commit-tooltip" class="info tooltip" hidden={hoveredIndex === -1} style="top: {tooltipPosition.y}px; left: {tooltipPosition.x}px"  bind:this={commitTooltip}>
+<dl id="commit-tooltip" class="info tooltip" hidden={!showTooltip} style="top: {tooltipPosition.y}px; left: {tooltipPosition.x}px"  bind:this={commitTooltip}>
     <dt>Commit</dt>
     <dd><a href="{ hoveredCommit.url }" target="_blank">{ hoveredCommit.id } </a></dd>
 
@@ -263,9 +271,11 @@
     </div>
 {/each}
 
+<label for="dateSlider"> Show commits until: </label>
+<input type="range" id="dateSlider" min={dateExtent[0]} max={dateExtent[1]} step="1" bind:value={commitProgress}>
+<time id="selectedDateTime">{commitMaxTime.toLocaleString('en')}</time>
 
 <Pie data={Array.from(languageBreakdown).map(([language, lines]) => ({label: language, value: lines}))} />
-
 
 
 <style>
