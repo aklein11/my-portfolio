@@ -15,7 +15,8 @@
     import Pie from "$lib/Pie.svelte";
     import CommitScatterplot from "./Scatterplot.svelte";
     import FileLines from "./FileLines.svelte";
-    
+    import Scrolly from "svelte-scrolly";
+
 
     let colors = d3.scaleOrdinal(d3.schemeTableau10);
     let data = []; 
@@ -98,31 +99,68 @@
     </dl>
 </section>
 
-<label for="dateSlider"> Show commits until: </label>
+<!-- <label for="dateSlider"> Show commits until: </label>
 <input type="range" id="dateSlider" min={0} max={100} step="1" bind:value={commitProgress}>
-<time id="selectedDateTime">{commitMaxTime.toLocaleString('en')}</time>
+<time id="selectedDateTime">{commitMaxTime.toLocaleString('en')}</time> -->
 
-<CommitScatterplot commits={filteredCommits} bind:selectedCommits={selectedCommits} />
-{#each languageBreakdown as [language, filteredLines] }
-    <div>
-        <dl class="stats">
-            <dt>
-                {language}
-            </dt>
-            <dd>
-                {filteredLines} lines
-            </dd>
-        </dl>
-    </div>
+
+
+<Scrolly bind:progress={ commitProgress }>
+	{#each commits as commit, index }
+	<p>
+        Before this class I did not know how to use git or Github. Id ddidn't even know that they were different things. 
+        Then I worked through the first lab, and began getting familiar with the tools. 
+		On {commit.datetime.toLocaleString("en", {dateStyle: "full", timeStyle: "short"})},
+		I made <a href="{commit.url}" target="_blank">{ index > 0 ? 'another glorious commit' : 'my first commit, and it was glorious' }</a>.
+		I edited {commit.totalLines} lines across { d3.rollups(commit.lines, D => D.length, d => d.file).length } files.
+		Then I looked over all I had made, and I saw that it was very good.
+	</p>
 {/each}
 
-<Pie data={Array.from(languageBreakdown).map(([language, filteredLines]) => ({label: language, value: filteredLines}))} colors={colors}/>
+	<svelte:fragment slot="viz">
+		<CommitScatterplot commits={filteredCommits} bind:selectedCommits={selectedCommits} />
+        {#each languageBreakdown as [language, filteredLines] }
+            <div>
+                <dl class="stats">
+                    <dt>
+                        {language}
+                    </dt>
+                    <dd>
+                        {filteredLines} lines
+                    </dd>
+                </dl>
+            </div>
+        {/each}
+
+        <Pie data={Array.from(languageBreakdown).map(([language, filteredLines]) => ({label: language, value: filteredLines}))} colors={colors}/>
+
+	</svelte:fragment>
+</Scrolly>
 
 
-<FileLines lines={filteredLines} colors={colors}/>
+<Scrolly bind:progress={commitProgress} throttle={100} debounce={300} --scrolly-layout="viz-first" --scrolly-viz-width="1.5fr">
+	{#each commits as commit, index }
+	<p>
+        Before this class I did not know how to use git or Github. Id ddidn't even know that they were different things. 
+        Then I worked through the first lab, and began getting familiar with the tools. 
+		On {commit.datetime.toLocaleString("en", {dateStyle: "full", timeStyle: "short"})},
+		I made <a href="{commit.url}" target="_blank">{ index > 0 ? 'another glorious commit' : 'my first commit, and it was glorious' }</a>.
+		I edited {commit.totalLines} lines across { d3.rollups(commit.lines, D => D.length, d => d.file).length } files.
+		Then I looked over all I had made, and I saw that it was very good.
+	</p>
+{/each}
+
+	<svelte:fragment slot="viz">
+		<FileLines lines={filteredLines} colors={colors}/>
+	</svelte:fragment>
+</Scrolly>
 
 
 <style>
+
+    :global(body) {
+        max-width: min(120ch, 80vw);
+    }
 
    .stats {
         display: grid;  
