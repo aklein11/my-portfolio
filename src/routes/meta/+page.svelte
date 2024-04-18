@@ -14,7 +14,10 @@
     } from '@floating-ui/dom';
     import Pie from "$lib/Pie.svelte";
     import CommitScatterplot from "./Scatterplot.svelte";
+    import FileLines from "./FileLines.svelte";
+    
 
+    let colors = d3.scaleOrdinal(d3.schemeTableau10);
     let data = []; 
     let commits = [];
     let loc;
@@ -100,7 +103,6 @@
 <time id="selectedDateTime">{commitMaxTime.toLocaleString('en')}</time>
 
 <CommitScatterplot commits={filteredCommits} bind:selectedCommits={selectedCommits} />
-
 {#each languageBreakdown as [language, filteredLines] }
     <div>
         <dl class="stats">
@@ -114,7 +116,11 @@
     </div>
 {/each}
 
-<Pie data={Array.from(languageBreakdown).map(([language, filteredLines]) => ({label: language, value: filteredLines}))} />
+<Pie data={Array.from(languageBreakdown).map(([language, filteredLines]) => ({label: language, value: filteredLines}))} colors={colors}/>
+
+
+<FileLines lines={filteredLines} colors={colors}/>
+
 
 <style>
 

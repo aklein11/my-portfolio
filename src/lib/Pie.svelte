@@ -15,7 +15,7 @@
     //     { value: 5, label: "cherries" }
     // ];
 
-    let colors = d3.scaleOrdinal(d3.schemeTableau10);
+    export let colors = d3.scaleOrdinal(d3.schemeTableau10);
 
     function toggleWedge (index, event) {
         if (!event.key || event.key === "Enter") {
@@ -43,7 +43,7 @@
 <div class="container">
     <svg viewBox="-50 -50 100 100">
         {#each pieData as d, i}
-            <path d={d.arc} fill={colors(d.label)} 
+            <path d={d.arc} fill={colors(d.id ?? d.label)} 
                 class:selected={selectedIndex === i}
                 on:click={e => toggleWedge(i, e)} 
                 on:keyup={e => toggleWedge(i, e)}  
