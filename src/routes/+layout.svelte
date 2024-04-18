@@ -1,4 +1,5 @@
 <script>
+
     import { page } from '$app/stores';
 
     let pages = [
@@ -16,9 +17,32 @@
 
 	$: localStorage.colorScheme = colorScheme;
 	$: root?.style.setProperty('color-scheme', colorScheme);
+
 </script>
 
+
+<nav>
+    {#each pages as p}
+        <a href={ p.url } class:current={ "." + $page.route.id === p.url } target={ p.url.startsWith("http") ? "_blank" : null }>
+            { p.title }
+        </a>
+    {/each}
+</nav>
+
+<label class="color-scheme", position: absolute, top=1rem, right=1rem>
+    Theme:
+    <select bind:value={ colorScheme }>
+        <option value="light dark">Automatic</option>
+        <option value="light">Light Mode</option>
+        <option value="dark">Dark Mode</option>
+    </select>
+</label>
+
+<slot />
+
+
 <style>
+
     nav {
         --border-color: oklch(50% 10% 200 / 40%);
         
@@ -49,23 +73,7 @@
         top: 1rem;
         right: 1rem;
     }
+
 </style>
 
-<nav>
-    {#each pages as p}
-        <a href={ p.url } class:current={ "." + $page.route.id === p.url } target={ p.url.startsWith("http") ? "_blank" : null }>
-            { p.title }
-        </a>
-    {/each}
-</nav>
 
-<label class="color-scheme", position: absolute, top=1rem, right=1rem>
-    Theme:
-    <select bind:value={ colorScheme }>
-        <option value="light dark">Automatic</option>
-        <option value="light">Light Mode</option>
-        <option value="dark">Dark Mode</option>
-    </select>
-</label>
-
-<slot />

@@ -1,17 +1,7 @@
-<!-- 
-    TODOs
-    - reformat stats on the page (abt github and abt dots)
--->
-
 <script>
 
     import * as d3 from "d3";
     import { onMount } from "svelte";
-    import {
-        computePosition,
-        autoPlacement,
-        offset,
-    } from '@floating-ui/dom';
     import Pie from "$lib/Pie.svelte";
     import CommitScatterplot from "./Scatterplot.svelte";
     import FileLines from "./FileLines.svelte";
@@ -19,8 +9,8 @@
 
 
     let colors = d3.scaleOrdinal(d3.schemeTableau10);
-    let data = []; 
     let commits = [];
+    let data = []; 
     let loc;
 
     onMount(async () => {
@@ -55,7 +45,7 @@
 	        return ret;
         });
 
-        console.log(commits)
+        console.log("commits: ", commits)
     });
 
     $: maxDepth = data.length > 0 ? d3.max(data, d => d.depth) : "no data";
@@ -82,8 +72,6 @@
         return d.datetime <= commitMaxTime;
     })
 
-    
-
 </script>
 
 
@@ -102,8 +90,6 @@
 <!-- <label for="dateSlider"> Show commits until: </label>
 <input type="range" id="dateSlider" min={0} max={100} step="1" bind:value={commitProgress}>
 <time id="selectedDateTime">{commitMaxTime.toLocaleString('en')}</time> -->
-
-
 
 <Scrolly bind:progress={ commitProgress }>
 	{#each commits as commit, index }
@@ -140,15 +126,15 @@
 
 <Scrolly bind:progress={commitProgress} throttle={100} debounce={300} --scrolly-layout="viz-first" --scrolly-viz-width="1.5fr">
 	{#each commits as commit, index }
-	<p>
-        Before this class I did not know how to use git or Github. Id ddidn't even know that they were different things. 
-        Then I worked through the first lab, and began getting familiar with the tools. 
-		On {commit.datetime.toLocaleString("en", {dateStyle: "full", timeStyle: "short"})},
-		I made <a href="{commit.url}" target="_blank">{ index > 0 ? 'another glorious commit' : 'my first commit, and it was glorious' }</a>.
-		I edited {commit.totalLines} lines across { d3.rollups(commit.lines, D => D.length, d => d.file).length } files.
-		Then I looked over all I had made, and I saw that it was very good.
-	</p>
-{/each}
+        <p>
+            Before this class I did not know how to use git or Github. Id ddidn't even know that they were different things. 
+            Then I worked through the first lab, and began getting familiar with the tools. 
+            On {commit.datetime.toLocaleString("en", {dateStyle: "full", timeStyle: "short"})},
+            I made <a href="{commit.url}" target="_blank">{ index > 0 ? 'another glorious commit' : 'my first commit, and it was glorious' }</a>.
+            I edited {commit.totalLines} lines across { d3.rollups(commit.lines, D => D.length, d => d.file).length } files.
+            Then I looked over all I had made, and I saw that it was very good.
+        </p>
+    {/each}
 
 	<svelte:fragment slot="viz">
 		<FileLines lines={filteredLines} colors={colors}/>

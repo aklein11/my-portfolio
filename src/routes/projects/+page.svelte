@@ -1,8 +1,9 @@
 <script>
+    import * as d3 from 'd3';
+    import Pie from '$lib/Pie.svelte';
     import projects from '$lib/projects.json';
     import Project from "$lib/Project.svelte";
-    import Pie from '$lib/Pie.svelte';
-    import * as d3 from 'd3';
+    
     export let hLevel = 2;
 
     let query = "";
@@ -24,7 +25,6 @@
     });
 
     let pieData, rolledData;
-
     $: { 
         pieData = {}
         rolledData = d3.rollups(filteredProjects, v => v.length, d => d.year);
@@ -40,17 +40,16 @@
 
 </script>
 
+
 <svelte:head>
 	<title>Projects</title>
 </svelte:head>
 
 <Pie data={pieData} bind:selectedIndex={selectedYearIndex} />
 
-
 <input type="search" bind:value={query}
     aria-label="Search projects" placeholder="🔍 Search projects…" 
 />
-
 
 <h1>MIT</h1>
 <p>Robot in 2.S007, Labs in 6.009, Paper in 9.66</p>

@@ -1,4 +1,7 @@
-<script>export let info={};</script>
+<script>
+    export let info={};
+</script>
+
 
 <article>
     <h2>{info.title}</h2>
@@ -9,7 +12,9 @@
     </div>
 </article>
 
+
 <style>
+
     article {
         display: grid;
         grid-template-rows: subgrid;
@@ -25,4 +30,5 @@
         margin: 0;
         font-size: 120%;
     }   
+
 </style>

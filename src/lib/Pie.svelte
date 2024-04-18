@@ -209,9 +209,6 @@
                     translateY(-6px)
                     rotate(calc(-1 * var(--mid-angle)));
        }
-
-       /* fill-opacity: 75%; */
-
     }
 
     .selected {

@@ -47,15 +47,12 @@
         );
     }
 
-    
-
-    let loc = 0;
-
-    let hoveredIndex = -1;
-    $: hoveredCommit = commits[hoveredIndex] ?? {};
     let commitTooltip;
+    let hoveredIndex = -1;
     let showTooltip = false;
     let tooltipPosition = {x: 0, y: 0};
+
+    $: hoveredCommit = commits[hoveredIndex] ?? {};
 
     // Function to compute tooltip position
     async function computeTooltipPosition(hoveredDot) {
@@ -67,7 +64,6 @@
             ],
         });
     }
-
 
     async function dotInteraction (index, evt) {
         const hoveredDot = evt.target;
@@ -89,7 +85,6 @@
         }
     }
 
-    
     function brushed (evt) {
         let brushSelection = evt.selection;
         selectedCommits = !brushSelection ? [] : commits.filter(commit => {
@@ -107,7 +102,6 @@
         d3.select(svg).selectAll(".dots, .overlay ~ *").raise();
     }
 
-    
     function isCommitSelected (commit) {
         return selectedCommits.includes(commit);
     }
@@ -118,10 +112,7 @@
     $: selectedLines = (hasSelection ? selectedCommits : commits).flatMap(d => d.lines);
     $: languageBreakdown = d3.rollups(selectedLines, v => d3.max(v, v => v.line), d => d.type);
 
-    
-
 </script>
-
 
 
 <h3>Commits by time of day</h3>
@@ -177,8 +168,8 @@
 <p>{hasSelection ? selectedCommits.length : "No"} commits selected</p>
 
 
-
 <style>
+    
 	svg {
 		overflow: visible;
 	}
